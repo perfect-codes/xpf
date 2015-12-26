@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>代码生成器</title>
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+		<link rel="bookmark" href="favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="plugins/jquery-easyui-1.4.2/themes/default/easyui.css"/>
+		<link rel="stylesheet" href="plugins/jquery-easyui-1.4.2/themes/icon.css"/>
+		<script type="text/javascript" src="plugins/jquery-easyui-1.4.2/jquery.min.js"></script>
+		<script type="text/javascript" src="plugins/jquery-easyui-1.4.2/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="plugins/jquery-easyui-1.4.2/locale/easyui-lang-zh_CN.js"></script>
+		<script type="text/javascript" src="plugins/ajaxfileupload/ajaxfileupload.js"></script>
+		<style>
+			.label{
+				display:block;
+				height:10px;
+				width:auto;
+				font-size:14px;
+				font-weight:bold;
+				color:black;
+				margin-top:3px;
+			}
+			.fontgreen{
+				font-size:12px;
+				color:green;
+			}
+			.fontred{
+				font-size:12px;
+				color:red;
+			}
+			#a_downloadguide{
+				float:right;
+				position:relative;
+				top:25px;
+			}
+			.div-field{
+				margin-top:10px;
+			}
+			.input-field{
+				margin-top:10px;
+			}
+		</style>
+	</head>
+	<body class="easyui-layout">
+		<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px">
+			<!--顶部文件选择开始-->
+			<input type="file" id="file" name="file"/>
+			<a class="easyui-linkbutton" iconCls="icon-upload" onclick="ajaxFileUpload();">上传</a>
+			<a class="easyui-linkbutton" iconCls="icon-ok" onclick="analysis();">解析</a>
+			<!--顶部文件选择结束-->
+			<a href="AUTOCODER_GUIDE.docx" id="a_downloadguide">DOWNLOAD GUIDE</a>
+		</div>
+		<div data-options="region:'west',split:true,title:'设置',iconCls:'icon-setup'" style="width:450px;padding:20px;">
+			配置信息<hr>
+			<div class="div-field">
+				<span class="label">1、生成类的包名结构(如：cn.com.maxtech.util...)</span>
+				<input type="text" class="input-field" name="packageName" id="packageName"/>
+			</div>
+			<div class="div-field">
+				<span class="label">2、数据库表名前缀(如：MAX_AFFIX为MAX)</span>
+				<input type="text" class="input-field" name="tablePrefix" id="tablePrefix"/>
+			</div>
+			<div class="div-field">
+				<span class="label">3、主键生成策略</span><br/>
+				<select id="idstrategy">
+					<option value="0">无策略</option>
+					<option value="1">自增</option>
+				</select>
+			</div>
+			<!--<span class="label">4、表名转类名规则</span><br/>
+			<input type="text" class="" name="rule" id="rule"/><br/><br/>-->
+		</div>
+		<div data-options="region:'south',border:false,title:'控制台',split:true,iconCls:'icon-console',tools:'#tools'" style="height:100px;background:#FFFFFF;padding:10px;" id="console">
+		</div>
+		<div id="tools">
+			<a href="#" class="icon-clear" onclick="clearConsole();"></a>
+		</div>
+		<div data-options="region:'center',title:'列表',iconCls:'icon-list'">
+			<table id="dg"></table>
+		</div>
+	</body>
+	<script>
+		$(function(){
+		    $('#dg').datagrid({
+		        url:'sys/tables?i='+new Date().getTime(),
+		        rownumbers:true,
+		        columns:[[
+		        	{field:'ck',checkbox:true},
+		            {field:'tableName',title:'表名',width:150},
+		            {field:'tableCode',title:'编码(唯一)',width:200}
+		        ]],
+		        toolbar:[{
+					text:'全选',
+					iconCls:'icon-all',
+					handler:function(){$("#dg").datagrid("checkAll");}
+				},{
+					text:'不选',
+					iconCls:'icon-none',
+					handler:function(){$("#dg").datagrid("uncheckAll");}
+				},'-',{
+					text:'反选',
+					iconCls:'icon-reverse',
+					handler:function(){
+						var all = $("#dg").datagrid("getRows");
+						var checked = $("#dg").datagrid("getChecked");
+						for(var i=0;i<all.length;i++){
+							var flag = false;
+							var rowIndex = $("#dg").datagrid("getRowIndex",all[i]);
+							for(var j=0;j<checked.length;j++){
+								if(checked[j]==all[i]){
+									$("#dg").datagrid("uncheckRow",rowIndex);
+									flag = true;
+									break;
+								}
+							}
+							if(!flag){
+								$("#dg").datagrid("checkRow",rowIndex);
+							}
+						}
+					}
+				},'-',{
+					text:'构建',
+					iconCls:'icon-ok',
+					handler:function(){
+						var codestr = "";
+						var checked = $("#dg").datagrid("getChecked");
+						if(checked!=null&&checked.length>0){
+							for(var k=0;k<checked.length;k++){
+								if(k>0){
+									codestr += ",";
+								}
+								codestr += checked[k].tableCode;
+							}
+						}
+						console.info(codestr);
+						var data = {tableCodes:codestr,packageName:$("#packageName").val(),idstrategy:$("#idstrategy").val(),tablePrefix:$("#tablePrefix").val()};
+						$.post("sys/build?i="+new Date().getTime(),data,function(r){
+								getConsole();
+								if(r.status==1){
+									$.messager.confirm("构建完成","是否下载源码包?",function(flag){
+										if(flag){
+											console.info("是");
+											//$.get("sys/zipdownload/"+r.msg)
+											window.open("sys/zipdownload/"+r.msg);
+										}else{
+											console.info("否");
+										}
+									})
+								}else{
+									$.messager.alert("提示","构建失败","info");
+								}
+						},'json');
+						
+					}
+				}]
+		    });
+		})
+		//上传
+		function ajaxFileUpload(){
+			if($('#file').val()==""){
+				$.messager.alert("提示",'附件不能为空!','info');
+				return;
+			}
+			var obj_file = document.getElementById('file');
+			var filepath = obj_file.value;
+			var extStart = filepath.lastIndexOf(".");
+			var ext = filepath.substring(extStart, filepath.length).toUpperCase();
+			if (ext != ".PDM") {
+				$.messager.alert("提示",'只能上传.pdm格式文件','warn');
+				return;
+			}
+	        $.ajaxFileUpload ({
+		        url:"sys/fileUpload",//用于文件上传的服务器端请求地址
+		        secureuri: false, //是否需要安全协议，一般设置为false
+		        fileElementId: 'file', //文件上传域的ID
+		        dataType: 'json', //返回值类型 一般设置为json
+		        //data:{"objectId":objectId,"objectType":objectType},
+		        success: function (data, status){  //服务器成功响应处理函数
+		        	console.info(data);
+					getConsole();
+					$.messager.alert('提示',data.msg,'info');       	
+	            },
+	            error: function (data, status, e){//服务器响应失败处理函数
+					getConsole();
+					$.messager.alert('提示',data.msg,'info');
+	            }
+	        });
+		}
+		//解析
+		function analysis(){
+			$.get("sys/analyze?i="+new Date().getTime(),function(data){
+				if("ok"==data){
+					$("#dg").datagrid("reload");
+		        	//$.messager.alert('提示','解析完成','info');
+		        	//var item = "<span style='color:green;'>文件解析完成</span><br/>"
+					//$("#console").append(item);
+					getConsole();
+				}
+		    },"text");
+		}
+		
+		function getConsole(){
+			$.get("sys/console?i="+new Date().getTime(),function(data){
+				if(data!=""){
+					for(var i=0;i<data.length;i++){
+						$("#console").append(data[i]);						
+					}
+				}
+		    },"json");
+		}
+		
+		function clearConsole(){
+			$("#console").html("");
+			$.get("sys/console/clear?i="+new Date().getTime(),function(data){
+				if(data!=""){
+					getConsole();
+				}
+		    },"json");
+		}
+	</script>
+</html>

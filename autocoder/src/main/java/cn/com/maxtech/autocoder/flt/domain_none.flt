@@ -1,0 +1,48 @@
+package ${bean.packageName}.domain;
+
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+/**
+ * 
+* @Description: ${bean.tableName}
+* @Author AutoCoder
+* @Date ${.now?datetime}
+*
+ */
+@Entity
+@Table(name = "${bean.tableCode}")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "fieldHandler" })
+public class ${bean.className?cap_first} implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	<#list bean.properties as property>
+	<#if property.name == "id">
+	@Id
+	@Column(name = "ID")
+	</#if>
+	<#if property.name != "id">
+	/**
+	 * ${property.note}
+	 */
+	@Column(name = "${property.columnCode}")
+	</#if>
+	private ${property.type} ${property.name};
+	</#list>
+	
+	<#list bean.properties as property>
+	public ${property.type} get${property.name?cap_first}(){
+		return ${property.name};
+	}
+	public void set${property.name?cap_first}(${property.type} ${property.name}){
+		this.${property.name} = ${property.name};
+	}
+	</#list>
+}

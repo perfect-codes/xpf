@@ -1,0 +1,116 @@
+package ${bean.packageName}.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${bean.packageName}.domain.${bean.className?cap_first};
+import ${bean.packageName}.web.model.${bean.className?cap_first}Model;
+import ${bean.packageName}.repository.${bean.className?cap_first}Repository;
+/**
+ *
+* @Description: ${bean.tableName}的Service实现类
+* @Author AutoCoder
+* @Date ${.now?datetime}
+*
+ */
+@Service("${bean.className?uncap_first}Service")
+public class ${bean.className?cap_first}ServiceImpl implements ${bean.className?cap_first}Service{
+
+	@Autowired
+	private ${bean.className?cap_first}Repository ${bean.className?uncap_first}Repository;
+
+	@Transactional
+	@Override
+	public void addBean(${bean.className?cap_first} bean) throws Exception{
+	
+		this.${bean.className?uncap_first}Repository.save(bean);
+		
+	}
+	
+	@Transactional
+	@Override
+	public void addBeans(List<${bean.className?cap_first}> beans) throws Exception {
+
+		this.${bean.className?uncap_first}Repository.save(beans);
+	}
+	
+	@Transactional
+	@Override
+	public void deleteBean(long id) throws Exception{
+		this.${bean.className?uncap_first}Repository.delete(id);
+	}
+	
+	@Transactional	
+	@Override
+	public void deleteBeans(String ids) throws Exception {
+
+		if(ids!=null){
+			String[] idarr = ids.split(",");
+			for(String id:idarr){
+				deleteBean(Long.parseLong(id));
+			}
+		}
+	}
+	
+	@Transactional
+	@Override
+	public void updateBean(${bean.className?cap_first} bean) throws Exception{
+	
+		this.${bean.className?uncap_first}Repository.save(bean);
+		
+	}
+	
+	@Override
+	public ${bean.className?cap_first} findById(long id) throws Exception{
+	
+		return this.${bean.className?uncap_first}Repository.findOne(id);
+	
+	}
+	
+	@Override
+	public List<${bean.className?cap_first}> findAll() throws Exception{
+	
+		return this.${bean.className?uncap_first}Repository.findAll(getSpecification(null));
+	
+	}
+	
+	@Override
+	public Page<${bean.className?cap_first}> findByPagination(${bean.className?cap_first}Model model,Pageable pageable) throws Exception{
+	
+		return this.${bean.className?uncap_first}Repository.findAll(getSpecification(model),pageable);
+	
+	}
+	
+	private Specification<${bean.className?cap_first}> getSpecification(final ${bean.className?cap_first}Model model) {
+		return new Specification<${bean.className?cap_first}>() {
+			@Override
+			public Predicate toPredicate(Root<${bean.className?cap_first}> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+
+				List<Expression<Boolean>> andPredicates = new ArrayList<Expression<Boolean>>();
+				Predicate namePredicate = null;
+				if (andPredicates.isEmpty()) {
+					return null;
+				} else {
+					Predicate predicate = cb.conjunction();
+					predicate.getExpressions().addAll(andPredicates);
+					return predicate;
+				}
+			}
+		};
+	}
+	
+}

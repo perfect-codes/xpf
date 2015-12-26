@@ -1,0 +1,116 @@
+package ${bean.packageName}.web;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ${bean.packageName}.domain.${bean.className?cap_first};
+import ${bean.packageName}.service.${bean.className?cap_first}Service;
+import ${bean.packageName}.web.model.${bean.className?cap_first}Model;
+import cn.com.maxtech.web.BaseController;
+/**
+ *
+* @Description: ${bean.tableName}的业务类
+* @Author AutoCoder
+* @Date ${.now?datetime}
+*
+ */
+@RestController
+@RequestMapping({"/manager"})
+public class ${bean.className?cap_first}Controller extends BaseController{
+
+	 @Autowired
+	 private ${bean.className?cap_first}Service ${bean.className?uncap_first}Service;
+	 /**
+	   * 添加
+	   */
+	 @RequestMapping(value = { "/${bean.className?lower_case}" }, method = { org.springframework.web.bind.annotation.RequestMethod.POST })
+	 public String add(@RequestBody ${bean.className?cap_first}Model model, HttpServletRequest request,
+				HttpServletResponse response) {
+		  	${bean.className?cap_first} bean=new ${bean.className?cap_first}();
+		  	bindBean(model, bean);
+		  	try {
+		  		this.${bean.className?uncap_first}Service.addBean(bean);
+				return super.success(bean.getId(), "添加成功!");
+			} catch (Exception e) {
+				super.log.error("${bean.className?cap_first}添加错误",e);
+			}
+			return super.failure("添加失败！");
+	  }
+	  /**
+	   * 删除
+	   */
+	  @RequestMapping(value = { "/${bean.className?lower_case}/{id}" }, method = { org.springframework.web.bind.annotation.RequestMethod.DELETE })
+	  public String delete(@PathVariable Long id,HttpServletRequest request, HttpServletResponse response) {
+			try {
+				this.${bean.className?uncap_first}Service.deleteBean(id);
+				return super.success(null, "删除成功");
+			}  catch (Exception e) {
+				super.log.error("${bean.className?cap_first}删除错误",e);
+			}
+			return super.failure("删除失败！");
+	  }
+	  /**
+	   * 批量删除
+	   */
+	  @RequestMapping(value = { "/${bean.className?lower_case}/deletes" }, method = { org.springframework.web.bind.annotation.RequestMethod.POST })
+	  public String deletes(@RequestParam String cs,HttpServletRequest request, HttpServletResponse response) {
+			try {
+				this.${bean.className?uncap_first}Service.deleteBeans(cs);
+				return super.success(null, "删除成功");
+			}  catch (Exception e) {
+				super.log.error("Customer删除错误",e);
+			}
+			return super.failure("删除失败！");
+	  }
+	  /**
+	   * 修改
+	   */
+	  @RequestMapping(value={"/${bean.className?lower_case}/{id}"}, method={org.springframework.web.bind.annotation.RequestMethod.PUT})
+	  public String update(@PathVariable Long id,@RequestBody  ${bean.className?cap_first}Model model){
+		  try {
+			  ${bean.className?cap_first} bean = this.${bean.className?uncap_first}Service.findById(id);
+			  this.bindBean(model,bean);
+			  this.${bean.className?uncap_first}Service.updateBean(bean);
+			  return super.success(id,"修改成功");
+		  } catch (Exception e) {
+			super.log.error("${bean.className?cap_first}修改错误",e);
+		  }
+		  return super.failure("修改失败！");
+	  }
+	  /**
+	   * 根据ID获取对象
+	   */
+	  @RequestMapping(value={"/${bean.className?lower_case}/{id}"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
+	  public ${bean.className?cap_first} findOne(@PathVariable Long id){
+	    try {
+	    	${bean.className?cap_first} bean = this.${bean.className?uncap_first}Service.findById(id);
+		    return bean;
+		} catch (Exception e) {
+			super.log.error("${bean.className?cap_first}单个查询错误",e);
+		}
+		return null;
+	  }
+	  /**
+	   * 分页查询
+	   */
+	  @RequestMapping(value={"/${bean.className?lower_case}s"}, method={org.springframework.web.bind.annotation.RequestMethod.GET, org.springframework.web.bind.annotation.RequestMethod.POST})
+	  public Page<${bean.className?cap_first}> findByPage(@ModelAttribute ${bean.className?cap_first}Model model, HttpServletRequest request, HttpServletResponse response){
+		  try {
+		      Pageable pageable = super.getPageable(request);
+		      Page<${bean.className?cap_first}> beans = this.${bean.className?uncap_first}Service.findByPagination(model, pageable);
+		      return beans;
+		  } catch (Exception e) {
+			  super.log.error("${bean.className?cap_first}分页查询错误",e);
+		  }
+		  return null;
+	  }
+}

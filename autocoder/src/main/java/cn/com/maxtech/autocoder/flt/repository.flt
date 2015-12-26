@@ -1,0 +1,17 @@
+package ${bean.packageName}.repository;
+
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import ${bean.packageName}.domain.${bean.className?cap_first};
+/**
+ *
+* @Description: ${bean.tableName}的Repository类
+* @Author AutoCoder
+* @Date ${.now?datetime}
+*
+ */
+@Repository
+public interface ${bean.className?cap_first}Repository extends CrudRepository<${bean.className?cap_first},Long>,JpaSpecificationExecutor<${bean.className?cap_first}> {
+	
+}

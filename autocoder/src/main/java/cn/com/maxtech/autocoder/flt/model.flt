@@ -1,0 +1,29 @@
+package ${bean.packageName}.web.model;
+
+import cn.com.maxtech.web.model.BaseModel;
+import java.util.Date;
+/**
+ *
+* @Description: ${bean.tableName}的Model类
+* @Author AutoCoder
+* @Date ${.now?datetime}
+*
+ */
+public class ${bean.className?cap_first}Model  extends BaseModel{
+
+	<#list bean.properties as property>
+	/**
+	 * ${property.note}
+	 */
+	private ${property.type} ${property.name};
+	</#list>
+	
+	<#list bean.properties as property>
+	public ${property.type} get${property.name?cap_first}(){
+		return ${property.name};
+	}
+	public void set${property.name?cap_first}(${property.type} ${property.name}){
+		this.${property.name} = ${property.name};
+	}
+	</#list>
+}
