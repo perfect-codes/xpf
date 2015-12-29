@@ -82,7 +82,7 @@
 	}
 	//添加的方法
 	function add() {
-		parent.addTabs("新增充值卡", contextPath
+		parent.addTabs("新增${bean.tableName}", contextPath
 				+ "system/${bean.className?lower_case}/${bean.className?lower_case}_add.html?_pfrid=" + $.getUrlParam("_frid"));
 	}
 	//修改的方法
@@ -91,12 +91,12 @@
 		if (id == "") {
 			return;
 		}
-		parent.addTabs("编辑充值卡-" + id, contextPath
+		parent.addTabs("编辑${bean.tableName}-" + id, contextPath
 				+ "system/${bean.className?lower_case}/${bean.className?lower_case}_add.html?id=" + id + "&_pfrid="	+ $.getUrlParam("_frid"));
 	}
 	//行的双击事件
 	function dbClick(rowIndex, rowData) {
-		parent.addTabs("编辑充值卡-" + rowData['id'], contextPath
+		parent.addTabs("编辑${bean.tableName}-" + rowData['id'], contextPath
 				+ "system/${bean.className?lower_case}/${bean.className?lower_case}_add.html?id=" + rowData['id'] + "&_pfrid=" + $.getUrlParam("_frid"));
 	}
 	

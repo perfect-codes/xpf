@@ -61,13 +61,13 @@ public class TemplateUtil {
     	//model目录
     	String modelPath = buildPath+getPathFromPackageName(model.getPackageName())+"web/model";
     	//page目录
-    	String pageFolerName = firstLowerCase(model.getClassName());
+    	String pageFolerName = model.getClassName().toLowerCase();
     	String pagePath = buildPath+"/"+pageFolerName;
         config.setEncoding(Locale.CHINA, "utf-8");
         if(idstrategy==0){
-        	createFile(config,version,model,model.getClassName(),"domain_none.flt",domainPath);
+        	createFile(config,version,model,model.getClassName()+".java","domain_none.flt",domainPath);
         }else if(idstrategy==1){
-        	createFile(config,version,model,model.getClassName(),"domain.flt",domainPath);
+        	createFile(config,version,model,model.getClassName()+".java","domain.flt",domainPath);
         }
 		createFile(config,version,model,model.getClassName()+"Repository.java","repository.flt",repositoryPath);
 		createFile(config,version,model,model.getClassName()+"Service.java","service.flt",servicePath);
